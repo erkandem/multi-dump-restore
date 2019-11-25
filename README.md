@@ -9,7 +9,31 @@
 
 
 ### Summary
-> todo: write me
+Time series datasets usally are organized flat and are less or not at all interrelated to each other. One serial or time column conveniently works as an index / primary key column "organizing" `N` columns.
+
+Think of a typical financial dataset consisting of:
+ - timestamp, open, high, low, close, volume and more
+
+or the resulting data of a fluid/speed simulations: 
+ - timestamp, volume_1 ... volume_N [x_speed, y_speed_, z_speed],
+
+Dumping and restoring the complete database in one piece might be undesired because
+ - size might be inconvienent (e.g. upload(!) and download duration),
+ - may take to long (i.e. at least tell us the progress ffs),
+ - may not be necessary since the datasets are not interrelated.
+
+Also dumping the database table wise might be an overkill, since some grouping is desired.
+Examples could be:
+ - different volume slices for fluid/speed simulations,
+ - different financial options chains listed for an / on an underlying 
+
+A Posgres schema offers a structural element to isolate tables 
+much like folders are used to isolate files.
+Backups for single digit schemata and tables might conveniently
+be done interactivly at the shell or with GUI tools like pgAdmin.
+
+> For everything else, there's `multi dump-restore`. (rip MasterCard)
+
 
 ### Sample Use Cases:
   - You have schemata which you would like to add to an other database.
@@ -162,6 +186,7 @@ optional arguments:
  - add basic doc strings until API and flow hardens
  - replace `os.system` anti-pattern with `subprocess`
    - replacement for `>>` needed 
+ - option to exclude certain schema name(s)(pattern)
  
 ### Further Reading:
 > Devs have to get it right almost all the time.
