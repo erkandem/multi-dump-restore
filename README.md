@@ -28,8 +28,7 @@ A Posgres schema offers a structural element to isolate tables
 much like folders are used to isolate files.
 Backups for single digit schemata and tables might conveniently
 be done interactivly at the shell or with GUI tools like pgAdmin.
-
-> For everything else, there's `multi dump-restore`. (rip MasterCard)
+For everything else, there's **`multi dump-restore`**. (rip MasterCard)
 
 
 ### Sample Use Cases:
