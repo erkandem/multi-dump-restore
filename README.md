@@ -10,12 +10,9 @@
 
 ### Summary
 Time series datasets usally are organized flat and are less or not at all interrelated to each other. One serial or time column conveniently works as an index / primary key column "organizing" `N` columns.
-
-Think of a typical financial dataset consisting of:
- - timestamp, open, high, low, close, volume and more
-
-or the resulting data of a fluid/speed simulations: 
- - timestamp, volume_1 ... volume_N [x_speed, y_speed_, z_speed],
+Example could be:
+ - results of a fluid/speed simulations: timestamp, state_in_volume_element_1 .. state_in_volume_element_N ,
+ - financial dataset consisting of: timestamp, open, high, low, close, volume and more.
 
 Dumping and restoring the complete database in one piece might be undesired because
  - size might be inconvienent (e.g. upload(!) and download duration),
