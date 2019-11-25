@@ -168,13 +168,10 @@ optional arguments:
 Black hats only need to catch them once.
 
  - [pg_dump docs](https://www.postgresql.org/docs/10/app-pgdump.html)
-
  - [pg_restore docs](https://www.postgresql.org/docs/10/app-pgrestore.html) 
-
  - [.pgpass docs ](https://www.postgresql.org/docs/10/libpq-pgpass.html)<a id="pgpass"></a>
    `.pgpass` is needed to run `pg_restore` and `pg_dump` without typing passwords. Otherwise,
    passwords would be queried for **each** command.
-
  - [avoid exposing 5432 on the server](https://www.postgresql.org/docs/10/ssh-tunnels.html)
    Postgres is a powerful tool. Exposing it to the public is calling for trouble.
    SSH into your server instead.
