@@ -2,7 +2,11 @@
 *a wrapper around pg_dump/pg_restore focused on schema wise backups and restores*
 * * * 
 
-> **alpha** version, developed on linux,  C-python 3.7
+
+`⚠`️ **alpha** version, developed on linux, (C-)python 3.7, PostgreSQL 10.11
+
+`⚠`️ don't pipe external arguments: unescaped `os.system()` call
+
 
 ### Summary
 > todo: write me
