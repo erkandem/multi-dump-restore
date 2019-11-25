@@ -156,7 +156,7 @@ optional arguments:
     - python implementation [cpython(x), pypy]
  - combine command code generation for `basic` with `schema_wise` dump
  - add basic doc strings until API and flow hardens
- 
+ - replace `os.system` anti-pattern with `subprocess`
  
 ### Further Reading:
 > Devs have to get it right almost all the time.
