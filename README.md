@@ -161,7 +161,7 @@ optional arguments:
  - combine command code generation for `basic` with `schema_wise` dump
  - add basic doc strings until API and flow hardens
  - replace `os.system` anti-pattern with `subprocess`
-   - replacement for needed `>>`
+   - replacement for `>>` needed 
  
 ### Further Reading:
 > Devs have to get it right almost all the time.
@@ -190,11 +190,11 @@ SSH into your server instead.
 #### other projects:
 
  - [abe-winter/pg13-py](https://github.com/abe-winter/pg13-py)  *fast(er) SQL mocking for python* 
- - [pg_diagramconvert](https://github.com/qweeze/pg_diagramconvert) *postgresql schema to ER diagram generation* 
+ - [pg_diagramconvert](https://github.com/qweeze/pg_diagram) *convert schema to ER diagram* 
  - [akaihola/pgtricks](https://github.com/akaihola/pgtricks) kind of table wise backups via *pg_incremental_backup*
- - [gmr/pgdumplib](https://github.com/gmr/pgdumplib) *reading and writing pg_dump files using the custom format*
- - [tomyl/pg-dump-upsert](https://github.com/tomyl/pg-dump-upsert) *dump a postgresql table as `INSERT` statements with `ON CONFLICT` clause* 
- - [Jaymon/dump](https://github.com/Jaymon/dump)  *general pg_dump wrapper *
+ - [gmr/pgdumplib](https://github.com/gmr/pgdumplib) *reading and writing binary backup files (custom)*
+ - [tomyl/pg-dump-upsert](https://github.com/tomyl/pg-dump-upsert) *dump tables as `INSERT` statements with `ON CONFLICT` clause* 
+ - [Jaymon/dump](https://github.com/Jaymon/dump)  *general pg_dump wrapper*
 
 
 ### Author:
