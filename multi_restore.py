@@ -35,7 +35,7 @@ def restore_loop(
             f" --port '{pgc.port}' "
             f" --username '{pgc.user}' "
             f" --no-password "
-            f" --jobs {int(CORES)} " 
+            f" --jobs {int(CORES)} "
             f" '{file_path}' "
             f" >> logs/{bkp_name}_multi_restore.log 2>&1 "
         )
