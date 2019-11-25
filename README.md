@@ -31,7 +31,7 @@ be done interactivly at the shell or with GUI tools like pgAdmin.
 For everything else, there's **`multi dump-restore`**. (rip MasterCard)
 
 
-### Sample Use Cases:
+### Other Use Cases:
   - You have schemata which you would like to add to an other database.
     Renaming `testing_db` to `hot_spicy_db` won't do the trick because
     `hot_spicy_db` has already hot and spicy data in it.
