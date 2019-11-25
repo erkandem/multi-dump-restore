@@ -5,7 +5,7 @@
 
 `⚠`️ **alpha** version, developed on linux, (C-)python 3.7, PostgreSQL 10.11
 
-`⚠`️ don't pipe external arguments: unescaped `os.system()` call
+`⚠`️ don't pipe external arguments into `multi_dump`/`multi_restore`: unescaped `os.system()` call
 
 
 ### Summary
@@ -109,7 +109,7 @@ Obviously, this is the structure which will be created by `multi_dump`.
 ![Caution. rick takes a dump](docs/static/take_a_dump.png) 
 
 If the resulting backup files were never actually restored
-you are likely to sit on a pile of dumps. 
+you are likely to sit on a pile of dumps.
  - test whether the `.backup` file can be restored
  - and the restored database passes some tests to prove that it is working
  - remove / delete the restored database afterwards. 
@@ -165,27 +165,19 @@ optional arguments:
  
 ### Further Reading:
 > Devs have to get it right almost all the time.
-Black hats only need to catch you once.
+Black hats only need to catch them once.
 
-#### pg_dump docs
-all command line options
-[https://www.postgresql.org/docs/10/app-pgdump.html](https://www.postgresql.org/docs/10/app-pgdump.html)
+ - [pg_dump docs](https://www.postgresql.org/docs/10/app-pgdump.html)
 
+ - [pg_restore docs](https://www.postgresql.org/docs/10/app-pgrestore.html) 
 
-#### pg_restore docs
-all command line options
-[https://www.postgresql.org/docs/10/app-pgrestore.html](https://www.postgresql.org/docs/10/app-pgrestore.html)
+ - [.pgpass docs ](https://www.postgresql.org/docs/10/libpq-pgpass.html)<a id="pgpass"></a>
+   `.pgpass` is needed to run `pg_restore` and `pg_dump` without typing passwords. Otherwise,
+   passwords would be queried for **each** command.
 
-#### .pgpass docs
-<a id="pgpass"></a>
-`.pgpass` is needed to run `pg_restore` and `pg_dump` without typing passwords.
-Passwords would be queried for **each** command.
-[https://www.postgresql.org/docs/10/libpq-pgpass.html](https://www.postgresql.org/docs/10/libpq-pgpass.html)
-
-#### avoid exposing 5432 on the server
-Postgres is a powerful tool. Exposing it to the public is calling for trouble.
-SSH into your server instead. 
-[https://www.postgresql.org/docs/10/ssh-tunnels.html](https://www.postgresql.org/docs/10/ssh-tunnels.html)
+ - [avoid exposing 5432 on the server](https://www.postgresql.org/docs/10/ssh-tunnels.html)
+   Postgres is a powerful tool. Exposing it to the public is calling for trouble.
+   SSH into your server instead.
 
 #### other projects:
 
