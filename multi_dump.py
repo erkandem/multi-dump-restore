@@ -75,19 +75,20 @@ def basic_dump(
         f" '{db_name}' "
         f" >> logs/{backup_name}_multidump.log 2>&1 "
     )
-
     if armed:
-        msg = json.dumps({
-            'dt': nowstr(),
-            'msg': f'dumping {db_name} to {file_path.__str__()}'
-        })
-        print(msg)
+        print(
+            json.dumps({
+                'dt': nowstr(),
+                'msg': f'dumping {db_name} to {file_path.__str__()}'
+            })
+        )
         os.system(cmd)
-        msg = json.dumps({
-            'dt': nowstr(),
-            'msg': f'finished dumping {db_name} to {file_path.__str__()}'
-        })
-        print(msg)
+        print(
+            json.dumps({
+                'dt': nowstr(),
+                'msg': f'finished dumping {db_name} to {file_path.__str__()}'
+            })
+        )
     else:
         print(cmd)
 
