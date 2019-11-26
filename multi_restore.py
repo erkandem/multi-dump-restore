@@ -5,7 +5,7 @@ import argparse
 from pathlib import Path
 from datetime import datetime as dt
 import multiprocessing
-from appconfig import pgc, PostgresConfig, known_db_names
+from appconfig import pgc, PostgresConfig, check_if_known_db_name
 
 pause_var = 1   # length of pause  between loops
 CORES = multiprocessing.cpu_count()
@@ -115,7 +115,7 @@ if __name__ == "__main__":
     )
     p.add_argument(
         'backup_db_name',
-        help='database from which the schema was dropped'
+        help='database from which the schema was dumped'
     )
     p.add_argument(
         'restore_db_name',
@@ -132,17 +132,6 @@ if __name__ == "__main__":
         a.armed = False
     if a.armed == 'True':
         a.armed = True
-    if a.backup_db_name not in known_db_names:
-        print(
-            f'The db_name given ({a.backup_db_name}) '
-            f'does not appear in the known databases'
-            f'Be sure you left a record in the .pgpass file'
-        )
-    if a.restore_db_name not in known_db_names:
-        print(
-            f'The db_name given ({a.restore_db_name}) '
-            f'does not appear in the known databases'
-            f'Be sure you left a record in the .pgpass file'
-        )
-
+    check_if_known_db_name(a.backup_db_name)
+    check_if_known_db_name(a.restore_db_name)
     main(a)
