@@ -152,7 +152,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 run.sh
-
+./.idea*
 # Translations
 *.mo
 *.pot
