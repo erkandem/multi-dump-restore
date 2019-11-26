@@ -14,11 +14,23 @@ import os
 from pathlib import Path
 import sys
 from sqlalchemy import create_engine
-from appconfig import PostgresConfig, pgc, USER, check_if_known_db_name
+from appconfig import PostgresConfig, pgc, USER, check_if_known_db_name, BKP_BASE_PATH
 
 
 def nowstr():
     return dt.now().strftime('%Y-%m-%d %H:%M:%S')
+
+
+def get_file_name(db_name):
+    return f'{db_name}.backup'
+
+
+def get_default_bkp_name():
+    return dt.now().strftime('%Y%m%d')
+
+
+def compose_bkp_file_path(*, backup_path,  backup_name, db_name,  file_name):
+    return backup_path/ backup_path/ backup_name / db_name / file_name
 
 
 def get_schema_list(
@@ -43,6 +55,53 @@ def get_schema_list(
     return schema_list
 
 
+def _dump_cmd_template(db: PostgresConfig, db_name, file_path, backup_name, caller, schema=None):
+    """Reference: https://www.postgresql.org/docs/10/app-pgdump.html"""
+    core_cmd_fragments = [
+        f'{db.pg_dump_path}',
+        '--file', f'\'{file_path.__str__()}\'',
+        '--host', f'\'{db.host}\'',
+        '--port', f'\'{db.port}\'',
+        '--username', f'\'{db.user}\'',
+        '--no-password',
+        '--verbose',
+        '--format=c',
+        '--no-owner',
+        '--section=pre-data',
+        '--section=data',
+        '--section=post-data',
+        '--no-privileges',
+        '--no-tablespaces',
+        '--no-unlogged-table-data',
+    ]
+    if schema:
+        core_cmd_fragments += ['--schema', f'\'{schema}\'']
+    core_cmd_fragments += [f'\'{db_name}\'']
+    core_cmd = ' '.join(core_cmd_fragments)
+    log_cmd_fragments = ['>>', f'logs/{backup_name}_{caller}.log', '2>&1']
+    cmd = ' '.join([core_cmd] + log_cmd_fragments)
+    return cmd
+
+
+def execute_cmd(cmd, db_name, file_path, armed=False):
+    if not armed:
+        print(cmd)
+    else:
+        print(
+            json.dumps({
+                'dt': nowstr(),
+                'msg': f'dumping {db_name} to {file_path.__str__()}'
+            })
+        )
+        os.system(cmd)
+        print(
+            json.dumps({
+                'dt': nowstr(),
+                'msg': f'finished dumping {db_name} to {file_path.__str__()}'
+            })
+        )
+
+
 def basic_dump(
     db: PostgresConfig,
     backup_path: Path,
@@ -57,40 +116,15 @@ def basic_dump(
     file_name = f'{db_name}.backup'
     file_path = backup_path / f'{backup_name}' / db_name / file_name
     file_path.parent.mkdir(parents=True, exist_ok=True)
-    cmd = (
-        f"{db.pg_dump_path}  --file '{file_path.__str__()}' "
-        f" --host '{db.host}' "
-        f" --port '{db.port}' "
-        f" --username '{db.user}' "
-        f" --no-password "
-        f" --verbose "
-        f" --format=c "
-        f" --no-owner "
-        f" --section=pre-data "
-        f" --section=data "
-        f" --section=post-data "
-        f" --no-privileges "
-        f" --no-tablespaces "
-        f" --no-unlogged-table-data "
-        f" '{db_name}' "
-        f" >> logs/{backup_name}_multidump.log 2>&1 "
-    )
-    if armed:
-        print(
-            json.dumps({
-                'dt': nowstr(),
-                'msg': f'dumping {db_name} to {file_path.__str__()}'
-            })
-        )
-        os.system(cmd)
-        print(
-            json.dumps({
-                'dt': nowstr(),
-                'msg': f'finished dumping {db_name} to {file_path.__str__()}'
-            })
-        )
-    else:
-        print(cmd)
+    template_config = {
+        'db': db,
+        'db_name': db_name,
+        'file_path': file_path,
+        'backup_name': backup_name,
+        'caller': 'multi_dump'
+    }
+    cmd = _dump_cmd_template(**template_config)
+    execute_cmd(cmd, db_name, file_path, armed)
 
 
 def schema_dump_loop(
@@ -106,41 +140,16 @@ def schema_dump_loop(
         file_name = f'{schema}.backup'
         file_path = bkp_path / f'{backup_name}' / db_name / file_name
         file_path.parent.mkdir(parents=True, exist_ok=True)
-        cmd = (
-            f"{db.pg_dump_path}  --file '{file_path.__str__()}' "
-            f" --host '{db.host}' "
-            f" --port '{db.port}' "
-            f" --username '{db.user}' "
-            f" --no-password "
-            f" --verbose "
-            f" --format=c "
-            f" --no-owner "
-            f" --section=pre-data "
-            f" --section=data "
-            f" --section=post-data "
-            f" --no-privileges "
-            f" --no-tablespaces "
-            f" --no-unlogged-table-data "
-            f" --schema '{schema}' "
-            f" '{db_name}' "
-            f" >> logs/{backup_name}_multi_dump.log 2>&1 "
-        )
-        if armed:
-            print(
-                json.dumps({
-                    'dt': nowstr(),
-                    'msg': f'dumping {schema} to {file_path.__str__()}'
-                })
-            )
-            os.system(cmd)
-            print(
-                json.dumps({
-                    'dt': nowstr(),
-                    'msg': f'dumped {schema} to {file_path.__str__()}'
-                })
-            )
-        else:
-            print(cmd)
+        template_config = {
+            'db': db,
+            'db_name': db_name,
+            'file_path': file_path,
+            'backup_name': backup_name,
+            'caller': 'multi_dump',
+            'schema': schema
+        }
+        cmd = _dump_cmd_template(**template_config)
+        execute_cmd(cmd, db_name, file_path, armed)
 
 
 def main(args: argparse.Namespace):
@@ -158,12 +167,8 @@ def main(args: argparse.Namespace):
         raise NotImplementedError(msg)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     p = argparse.ArgumentParser()
-    p.add_argument(
-        'backup_path',
-        default=f'/home/{USER}/db/bkp',
-        help='path to ALL backups e.g. /home/user/db/bkp')
     p.add_argument(
         'db_name',
         help='name of database to dump'
@@ -172,6 +177,11 @@ if __name__ == "__main__":
         'dump_type',
         help='backup each schema in a separate file or the complete database in one single file',
         choices=['schema_wise', 'basic']
+    )
+    p.add_argument(
+        '--backup_path',
+        default=BKP_BASE_PATH.__str__(),
+        help='path to ALL backups e.g. /home/user/db/bkp'
     )
     p.add_argument(
         '--armed',
@@ -186,3 +196,4 @@ if __name__ == "__main__":
         a.armed = True
     check_if_known_db_name(a.db_name)
     main(a)
+
