@@ -5,14 +5,15 @@ import argparse
 from pathlib import Path
 from datetime import datetime as dt
 import multiprocessing
-from appconfig import pgc, PostgresConfig, check_if_known_db_name
+from appconfig import PostgresConfig, pgc, USER, check_if_known_db_name, BKP_BASE_PATH
 
 pause_var = 1   # length of pause  between loops
 CORES = multiprocessing.cpu_count()
 
 
 def nowstr():
-    return dt.now().strftime('%Y-%m-%d %H:%M:%S')
+    """enforce standardized dt string format"""
+    return dt.now().strftime('%Y-%m-%d %H:%M:%S.%f')
 
 
 def restore_loop(
@@ -35,6 +36,7 @@ def restore_loop(
             f" --port '{pgc.port}' "
             f" --username '{pgc.user}' "
             f" --no-password "
+            f" --verbose"
             f" --jobs {int(CORES)} "
             f" '{file_path}' "
             f" >> logs/{bkp_name}_multi_restore.log 2>&1 "
@@ -57,6 +59,7 @@ def restore_loop(
             )
         else:
             print(cmd)
+
 
 def restore_scouting(single_backup_path: Path):
     """
@@ -88,7 +91,8 @@ def main(args: argparse.Namespace):
     if sys.platform != 'linux':
         raise NotImplementedError('script is only configured to work on linux')
     Path('logs').mkdir(exist_ok=True, parents=True)
-    single_backup_path = Path(args.single_backup_path)
+    backup_path = Path(args.backup_path)
+    single_backup_path = backup_path / args.backup_name
     if not single_backup_path.exists():
         raise ValueError(f'Path does not seem to exist\n: {single_backup_path}')
     ini = restore_scouting(single_backup_path)
@@ -110,8 +114,8 @@ def main(args: argparse.Namespace):
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument(
-        'single_backup_path',
-        help='path to ONE PARTICULAR backup e.g. /home/user/db/bkp/20191123'
+        'backup_name',
+        help='ONE PARTICULAR backup e.g. 20191123 for /home/user/db/bkp/20191123'
     )
     p.add_argument(
         'backup_db_name',
@@ -120,6 +124,11 @@ if __name__ == "__main__":
     p.add_argument(
         'restore_db_name',
         help='database to which the schema should be restored to'
+    )
+    p.add_argument(
+        '--backup_path',
+        help='path to all backups on system default: /home/user/db/bkp/',
+        default=BKP_BASE_PATH.__str__(),
     )
     p.add_argument(
         '--armed',
