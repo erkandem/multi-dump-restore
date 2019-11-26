@@ -21,10 +21,16 @@ class PostgresConfig:
 
 pgc = PostgresConfig()
 USER = getpass.getuser()
-
-known_db_names = [
+KNOWN_DB_NAMES = [
     # previously configured and used databases
-    # manually maintained because script
-    # won't touch `~/.pgpass`
-
+    # manually maintained because the script
+    # won't touch ~/.pgpass
 ]
+
+def check_if_known_db_name(db_name):
+    if db_name not in KNOWN_DB_NAMES:
+        print(
+            f'The backup_db_name given ({db_name}) '
+            f'does not appear in the known_databases list in `appconfig`'
+            f'Be sure you left a record in the `.pgpass` file'
+        )
