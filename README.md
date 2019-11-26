@@ -9,13 +9,13 @@
 
 
 ### Summary
-Time series datasets usally are organized flat and are less or not at all interrelated to each other. One serial or time column conveniently works as an index / primary key column "organizing" `N` columns.
+Time series datasets usually are organized flat and are less or not at all interrelated to each other. One serial or time column conveniently works as an index / primary key column "organizing" `N` columns.
 Example could be:
  - results of a fluid/speed simulations: timestamp, state_in_volume_element_1 .. state_in_volume_element_N ,
  - financial dataset consisting of: timestamp, open, high, low, close, volume and more.
 
 Dumping and restoring the complete database in one piece might be undesired because
- - size might be inconvienent (e.g. upload(!) and download duration),
+ - size might be incontinent (e.g. upload(!) and download duration),
  - may take to long (i.e. at least tell us the progress ffs),
  - may not be necessary since the datasets are not interrelated.
 
@@ -45,16 +45,16 @@ For everything else, there's **`multi dump-restore`**. (rip MasterCard)
 ### Getting Started
  1. clone/download/copy-paste to a folder
  2. set environment variables 
- 3. take care of `.pgpass` (see [further reading / .pgpass](#pgpass))
+ 3. take care of `.pgpass` (see [further reading / .pgpass](#pgpass)
  4. customize command template generation (optional)
- 5. simulate a dump
- 6. execute a dump
- 7. simulate a restore
- 8. execute a restore
+ 5. simulate a dump && execute a dump
+ 6. simulate a restore && execute a restore
  
 
 #### Environment Variables
 create or append these variables into your `.env` file.
+it's preferable to use a `superuser`. otherwise you need to
+change the environment variables for each db (script won't touch `~/.pgpass`).
 Also, `USER` is requested, but `USER` should already be present.
 ```
 PG_USER=
@@ -147,7 +147,7 @@ positional arguments:
   backup_path           path to ALL backups e.g. /home/user/db/bkp
   db_name               name of database to dump
   {schema_wise,basic}   backup each schema in a separate file or the complete
-                        database in one single
+                        database in one single file
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -161,13 +161,14 @@ usage: multi_restore.py [-h] [--armed {True,False}]
 positional arguments:
   single_backup_path    path to ONE PARTICULAR backup e.g.
                         /home/user/db/bkp/20191123
-  backup_db_name        database from which the schema was dropped
+  backup_db_name        database from which the schema was dumped
   restore_db_name       database to which the schema should be restored to
 
 optional arguments:
   -h, --help            show this help message and exit
   --armed {True,False}  really execute commands? `False` by default
 ```
+
 
 ### Roadmap
 
@@ -182,8 +183,22 @@ optional arguments:
  - add basic doc strings until API and flow hardens
  - replace `os.system` anti-pattern with `subprocess`
    - replacement for `>>` needed 
- - option to exclude certain schema name(s)(pattern)
+ - option to exclude certain schema name(s)(patterns)
+   - from dump
+   - from restore
+ - multiple databases at once
+ - hash of back files
+ - check of hashes before restore is initiated
  
+### Contributing
+If our ideas are too different (see roadmap, codestyle, language) 
+just fork and vivisect the code you need.
+
+Otherwise only two rules. 
+  - fixing non functional typos via PR is not contributing.
+  - avoid double quotes, except it is JSON or necessary
+ 
+  
 ### Further Reading:
 > Devs have to get it right almost all the time.
 Black hats only need to catch them once.
@@ -198,8 +213,12 @@ Black hats only need to catch them once.
    SSH into your server instead.
 
 #### other projects:
+> I am not related to these project. I don't recommend or endorse them. 
+> They happend to pop up in my search. Some of them were not touched in years. 
+> Yet, they still may do what they promise to solve or inspire you to do something awesome.
 
- - [abe-winter/pg13-py](https://github.com/abe-winter/pg13-py)  *fast(er) SQL mocking for python* 
+ - [abe-winter/pg13-py](https://github.com/abe-winter/pg13-py) *testing utility - postgresSQL mocking for python* 
+ - [itissid/pypgTAP](https://github.com/itissid/pypgTAP)  *testing utility*
  - [pg_diagramconvert](https://github.com/qweeze/pg_diagram) *convert schema to ER diagram* 
  - [akaihola/pgtricks](https://github.com/akaihola/pgtricks) kind of table wise backups via *pg_incremental_backup*
  - [gmr/pgdumplib](https://github.com/gmr/pgdumplib) *reading and writing binary backup files (custom)*
