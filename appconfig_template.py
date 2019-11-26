@@ -23,11 +23,8 @@ pgc = PostgresConfig()
 USER = getpass.getuser()
 
 known_db_names = [
-    # previously configured and used databases ~/.pgpass
-    'experimental_usyh_rawdata',
-    'options_rawdata',
-    'pymarkets_tests_db_two',
-    'pymarkets_tests_db_two',
-    'prices_intraday',
-    'pgivbase'
+    # previously configured and used databases
+    # manually maintained because script
+    # won't touch `~/.pgpass`
+
 ]
