@@ -14,7 +14,7 @@ import os
 from pathlib import Path
 import sys
 from sqlalchemy import create_engine
-from appconfig import PostgresConfig, pgc, USER, known_db_names
+from appconfig import PostgresConfig, pgc, USER, check_if_known_db_name
 
 
 def nowstr():
@@ -170,7 +170,7 @@ if __name__ == "__main__":
     )
     p.add_argument(
         'dump_type',
-        help='backup each schema in a separate file or the complete database in one single',
+        help='backup each schema in a separate file or the complete database in one single file',
         choices=['schema_wise', 'basic']
     )
     p.add_argument(
@@ -184,10 +184,5 @@ if __name__ == "__main__":
         a.armed = False
     if a.armed == 'True':
         a.armed = True
-    if a.db_name not in known_db_names:
-        print(
-            f'The db_name given ({a.db_name}) '
-            f'does not appear in the known databases'
-            f'Be sure you left a record in the .pgpass file'
-        )
+    check_if_known_db_name(a.db_name)
     main(a)
