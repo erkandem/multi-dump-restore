@@ -7,7 +7,7 @@ from datetime import datetime as dt
 import multiprocessing
 from appconfig import PostgresConfig, pgc, USER, check_if_known_db_name, BKP_BASE_PATH
 
-pause_var = 1   # length of pause  between loops
+PAUSE_BETWEEN_RESTORE_SECONDS = 1
 CORES = multiprocessing.cpu_count()
 
 
