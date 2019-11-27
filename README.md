@@ -9,10 +9,13 @@
 
 
 ### Summary
-Time series datasets usually are organized flat and are less or not at all interrelated to each other. One serial or time column conveniently works as an index / primary key column "organizing" `N` columns.
+Time series datasets usually are organized flat and 
+are less or not at all interrelated to each other. 
+One serial or time column conveniently works as an 
+index / primary key column "organizing" `N` columns.
 Example could be:
- - results of a fluid/speed simulations: timestamp, state_in_volume_element_1 .. state_in_volume_element_N ,
- - financial dataset consisting of: timestamp, open, high, low, close, volume and more.
+ - results of a speed simulations: `timestamp`, `state_in_volume_element_1` .. `state_in_volume_element_N`,
+ - financial dataset consisting of: `timestamp`, `open`, `high`, `low`, `close`, `volume` and more.
 
 Dumping and restoring the complete database in one piece might be undesired because
  - size might be incontinent (e.g. upload(!) and download duration),
@@ -21,13 +24,13 @@ Dumping and restoring the complete database in one piece might be undesired beca
 
 Also dumping the database table wise might be an overkill, since some grouping is desired.
 Examples could be:
- - different volume slices for fluid/speed simulations,
+ - different volume slices for speed simulations,
  - different financial options chains listed for an / on an underlying 
 
-A Posgres schema offers a structural element to isolate tables 
+A Postgres schema offers a structural element to isolate tables 
 much like folders are used to isolate files.
 Backups for single digit schemata and tables might conveniently
-be done interactivly at the shell or with GUI tools like pgAdmin.
+be done interactively at the shell or with GUI tools like pgAdmin.
 For everything else, there's **`multi dump-restore`**. (rip MasterCard)
 
 
@@ -140,34 +143,40 @@ you are likely to sit on a pile of dumps.
 ### CLI Documentation
 #### `multi_dump`
 ```bash
-usage: multi_dump.py [-h] [--armed {True,False}]
-                     backup_path db_name {schema_wise,basic}
+usage: multi_dump.py [-h] [--backup_path BACKUP_PATH] [--armed {True,False}]
+                     db_name {schema_wise,basic}
 
 positional arguments:
-  backup_path           path to ALL backups e.g. /home/user/db/bkp
   db_name               name of database to dump
   {schema_wise,basic}   backup each schema in a separate file or the complete
                         database in one single file
 
 optional arguments:
   -h, --help            show this help message and exit
+  --backup_path BACKUP_PATH
+                        path to ALL backups e.g. /home/user/db/bkp
   --armed {True,False}  really execute commands? `False` by default
 ```
 #### `multi_restore`
 ```bash
-usage: multi_restore.py [-h] [--armed {True,False}]
-                        single_backup_path backup_db_name restore_db_name
+usage: multi_restore.py [-h] [--backup_path BACKUP_PATH]
+                        [--armed {True,False}]
+                        backup_name backup_db_name restore_db_name
 
 positional arguments:
-  single_backup_path    path to ONE PARTICULAR backup e.g.
+  backup_name           ONE PARTICULAR backup e.g. 20191123 for
                         /home/user/db/bkp/20191123
   backup_db_name        database from which the schema was dumped
   restore_db_name       database to which the schema should be restored to
 
 optional arguments:
   -h, --help            show this help message and exit
+  --backup_path BACKUP_PATH
+                        path to all backups on system default:
+                        /home/user/db/bkp/
   --armed {True,False}  really execute commands? `False` by default
 ```
+
 
 
 ### Roadmap
@@ -194,14 +203,11 @@ optional arguments:
 If our ideas are too different (see roadmap, codestyle, language) 
 just fork and vivisect the code you need.
 
-Otherwise only two rules. 
+Otherwise only one rules. 
   - fixing non functional typos via PR is not contributing.
-  - avoid double quotes, except it is JSON or necessary
  
   
 ### Further Reading:
-> Devs have to get it right almost all the time.
-Black hats only need to catch them once.
 
  - [pg_dump docs](https://www.postgresql.org/docs/10/app-pgdump.html)
  - [pg_restore docs](https://www.postgresql.org/docs/10/app-pgrestore.html) 
