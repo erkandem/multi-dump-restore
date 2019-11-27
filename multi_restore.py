@@ -1,3 +1,4 @@
+from  collections import namedtuple
 import os
 import sys
 import json
@@ -5,10 +6,15 @@ import argparse
 from pathlib import Path
 from datetime import datetime as dt
 import multiprocessing
-from appconfig import PostgresConfig, pgc, USER, check_if_known_db_name, BKP_BASE_PATH
+import appconfig as ac
 
 PAUSE_BETWEEN_RESTORE_SECONDS = 1
 CORES = multiprocessing.cpu_count()
+
+LogDetails = namedtuple(
+    'LogDetails',
+    ['k', 'K', 'schema', 'source', 'target']
+)
 
 
 def nowstr():
@@ -17,7 +23,7 @@ def nowstr():
 
 
 def restore_loop(
-        pgc: PostgresConfig,
+        pgc: ac.PostgresConfig,
         db_obj: {str: {'str': Path}},
         *,
         source: str,
@@ -29,36 +35,45 @@ def restore_loop(
     K = len(schemata)
     for k, schema in enumerate(schemata):
         file_path = schemata[schema]['path']
-        cmd = (
-            f"{pgc.pg_restore_path} "
-            f" --dbname {target} "
-            f" --host '{pgc.host}' "
-            f" --port '{pgc.port}' "
-            f" --username '{pgc.user}' "
-            f" --no-password "
-            f" --verbose"
-            f" --jobs {int(CORES)} "
-            f" '{file_path}' "
-            f" >> logs/{bkp_name}_multi_restore.log 2>&1 "
+        cmd_fragments = [
+            f'{pgc.pg_restore_path}',
+            '--dbname', f'{target}',
+            '--host', f'\'{pgc.host}\'',
+            '--port', f'\'{pgc.port}\'',
+            '--username', f'\'{pgc.user}\'',
+            '--no-password',
+            '--verbose',
+            '--jobs', f"{int(CORES)} ",
+            f'\'{file_path}\'',
+            '>>', f'logs/{bkp_name}_multi_restore.log', '2>&1',
+        ]
+
+        details = LogDetails(k, K, schema, source, target)
+        execute_restore(cmd_fragments, armed=armed, d=details)
+
+
+def execute_restore(cmd_fragments, *, armed=False, d: LogDetails = None):
+    if d is None:
+        d = LogDetails(0, 0, 0, 0, 0)
+    cmd = ' '.join(cmd_fragments)
+    if not armed:
+        print(cmd)
+    else:
+        print(
+            json.dumps({
+                'dt': nowstr(),
+                'progress': f'{d.k + 1}/{d.K}',
+                'msg': f'restoring {d.schema} from {d.source} to {d.target}'
+            })
         )
-        if armed:
-            print(
-                json.dumps({
-                    'dt': nowstr(),
-                    'progress': f'{k+1}/{K}',
-                    'msg': f'restoring {schema} from {source} to {target}'
-                })
-            )
-            os.system(cmd)
-            print(
-                json.dumps({
-                    'dt': nowstr(),
-                    'progress': f'{k+1}/{K}',
-                    'msg': f'restored {schema} from {source} to {target}'
-                })
-            )
-        else:
-            print(cmd)
+        os.system(cmd)
+        print(
+            json.dumps({
+                'dt': nowstr(),
+                'progress': f'{d.k + 1}/{d.K}',
+                'msg': f'restored {d.schema} from {d.source} to {d.target}'
+            })
+        )
 
 
 def restore_scouting(single_backup_path: Path):
@@ -100,7 +115,7 @@ def main(args: argparse.Namespace):
         N = len(ini[args.backup_db_name]['schemata'])
         print(f'# starting to restore {N} schemata')
         restore_loop(
-            pgc,
+            ac.pgc,
             ini[args.backup_db_name],
             source=args.backup_db_name,
             target=args.restore_db_name,
@@ -128,7 +143,7 @@ if __name__ == "__main__":
     p.add_argument(
         '--backup_path',
         help='path to all backups on system default: /home/user/db/bkp/',
-        default=BKP_BASE_PATH.__str__(),
+        default=ac.BKP_BASE_PATH.__str__(),
     )
     p.add_argument(
         '--armed',
@@ -141,6 +156,6 @@ if __name__ == "__main__":
         a.armed = False
     if a.armed == 'True':
         a.armed = True
-    check_if_known_db_name(a.backup_db_name)
-    check_if_known_db_name(a.restore_db_name)
+    ac.check_if_known_db_name(a.backup_db_name)
+    ac.check_if_known_db_name(a.restore_db_name)
     main(a)
