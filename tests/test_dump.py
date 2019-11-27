@@ -9,7 +9,7 @@ class TestDump:
         tu.pgts.init_db()
 
     @classmethod
-    def tear_down_class(cls):
+    def teardown_class(cls):
         tu.pgts.del_db()
 
     def test_get_schema_names(self):

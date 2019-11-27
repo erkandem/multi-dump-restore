@@ -48,7 +48,7 @@ class SampleData:
     dtypes = {c: Date if c == 'dt' else Float for c in list(df_data)}
 
     def __init__(self):
-        bdays = pd.date_range(start=dt(2005, 1, 1), end=dt(2019, 12, 31))
+        bdays = pd.date_range(start=dt(2019, 1, 1), end=dt(2019, 12, 31))
         self.bdays = bdays
         self.df = pd.DataFrame({
             'dt': bdays,
@@ -129,14 +129,13 @@ class PostgresTestingSuit:
             con.execute(f'CREATE SCHEMA IF NOT EXISTS {schema}')
 
     @staticmethod
-    def drop_schemata(schema_names, engine):
-        for schema in schema_names:
-            con = engine.raw_connection()
-            cursor = con.cursor()
-            cursor.execute(f'DROP SCHEMA {schema} CASCADE;')
-            con.commit()
-            cursor.close()
-            con.close()
+    def drop_schema(schema, engine):
+        con = engine.raw_connection()
+        cursor = con.cursor()
+        cursor.execute(f'DROP SCHEMA {schema} CASCADE;')
+        con.commit()
+        cursor.close()
+        con.close()
 
     @staticmethod
     def create_table(schema, table, engine):
@@ -145,7 +144,7 @@ class PostgresTestingSuit:
             con.execute(sql)
 
     def init_db(self):
-        sd= SampleData()
+        sd = SampleData()
         for schema in sd.schema_names:
             self.create_schemata(schema, self.engine)
             for table in sd.table_names:
@@ -161,6 +160,7 @@ class PostgresTestingSuit:
 
     def del_db(self):
         for schema in SampleData.schema_names:
-            self.drop_schemata(schema, self.engine)
+            self.drop_schema(schema, self.engine)
+
 
 pgts = PostgresTestingSuit()
