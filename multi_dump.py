@@ -34,6 +34,22 @@ def compose_bkp_file_path(*, backup_path,  backup_name, db_name,  file_name):
     return backup_path/ backup_path/ backup_name / db_name / file_name
 
 
+def hash_dump(bkp_path):
+    from py_essentials import hashing as hs
+    data = hs.createHashtree(bkp_path)
+    if type(bkp_path) is str:
+        bkp_path = Path(bkp_path)
+    file_path = bkp_path / 'hash_tree.json'
+    print(json.dumps({
+        'dt': nowstr(),
+        'msg': f'creating hash_tree at {str(file_path)}'
+    }))
+    if 'hash_tree.json' in data:
+        data.pop('hash_tree.json')
+    with open(file_path, 'w') as file:
+        json.dump(data, file, sort_keys=True, indent=4)
+
+
 def get_schema_list(
         db: ac.PostgresConfig,
         db_name: str
