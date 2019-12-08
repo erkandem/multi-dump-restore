@@ -106,11 +106,11 @@ def main(args: argparse.Namespace):
     if sys.platform != 'linux':
         raise NotImplementedError('script is only configured to work on linux')
     Path('logs').mkdir(exist_ok=True, parents=True)
-    backup_path = Path(args.backup_path)
-    single_backup_path = backup_path / args.backup_name
-    if not single_backup_path.exists():
-        raise ValueError(f'Path does not seem to exist\n: {single_backup_path}')
-    ini = restore_scouting(single_backup_path)
+    bkp_base_path = Path(args.bkp_base_path)
+    bkp_path = bkp_base_path / args.backup_name
+    if not bkp_path.exists():
+        raise ValueError(f'Path does not seem to exist\n: {bkp_path}')
+    ini = restore_scouting(bkp_path)
     if args.backup_db_name in list(ini):
         N = len(ini[args.backup_db_name]['schemata'])
         print(f'# starting to restore {N} schemata')
@@ -122,7 +122,7 @@ def main(args: argparse.Namespace):
             armed=args.armed
         )
     else:
-        msg = f'{args.backup_db_name} was not found at f{single_backup_path.__str__()}'
+        msg = f'{args.bkp_db_name} was not found at f{str(bkp_path)}'
         raise ValueError(msg)
 
 
@@ -133,7 +133,7 @@ if __name__ == "__main__":
         help='ONE PARTICULAR backup e.g. 20191123 for /home/user/db/bkp/20191123'
     )
     p.add_argument(
-        'backup_db_name',
+        'bkp_db_name',
         help='database from which the schema was dumped'
     )
     p.add_argument(
@@ -141,9 +141,9 @@ if __name__ == "__main__":
         help='database to which the schema should be restored to'
     )
     p.add_argument(
-        '--backup_path',
+        '--bkp_base_path',
         help='path to all backups on system default: /home/user/db/bkp/',
-        default=ac.BKP_BASE_PATH.__str__(),
+        default=str(ac.BKP_BASE_PATH),
     )
     p.add_argument(
         '--armed',

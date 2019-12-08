@@ -11,6 +11,7 @@ import argparse
 from datetime import datetime as dt
 import json
 import os
+from typing import Union
 from pathlib import Path
 import sys
 from sqlalchemy import create_engine
@@ -55,7 +56,7 @@ def get_schema_list(
     return schema_list
 
 
-def _dump_cmd_template(db: ac.PostgresConfig, db_name, file_path, backup_name, caller, schema=None):
+def _dump_cmd_template(db: ac.PostgresConfig, db_name, file_path, bkp_name, caller, schema=None):
     """Reference: https://www.postgresql.org/docs/10/app-pgdump.html"""
     core_cmd_fragments = [
         f'{db.pg_dump_path}',
@@ -78,11 +79,9 @@ def _dump_cmd_template(db: ac.PostgresConfig, db_name, file_path, backup_name, c
         core_cmd_fragments += ['--schema', f'\'{schema}\'']
     core_cmd_fragments += [f'\'{db_name}\'']
     core_cmd = ' '.join(core_cmd_fragments)
-    log_cmd_fragments = ['>>', f'logs/{backup_name}_{caller}.log', '2>&1']
+    log_cmd_fragments = ['>>', f'logs/{bkp_name}_{caller}.log', '2>&1']
     cmd = ' '.join([core_cmd] + log_cmd_fragments)
     return cmd
-
-from typing import Union
 
 
 def execute_cmd(cmd, db_name, *, armed=False, file_path: Union[str, Path] = None):
@@ -106,7 +105,7 @@ def execute_cmd(cmd, db_name, *, armed=False, file_path: Union[str, Path] = None
 
 def basic_dump(
     db: ac.PostgresConfig,
-    backup_path: Path,
+    bkp_base_path: Path,
     db_name: str,
     armed=False
 ):
@@ -115,8 +114,9 @@ def basic_dump(
     Reference: https://www.postgresql.org/docs/10/app-pgdump.html
     """
     bkp_name = (dt.now()).strftime('%Y%m%d')
+    bkp_path = bkp_base_path / f'{bkp_name}'
     file_name = f'{db_name}.backup'
-    file_path = backup_path / f'{bkp_name}' / db_name / file_name
+    file_path = bkp_path / db_name / file_name
     file_path.parent.mkdir(parents=True, exist_ok=True)
     template_config = {
         'db': db,
@@ -127,20 +127,23 @@ def basic_dump(
     }
     cmd = _dump_cmd_template(**template_config)
     execute_cmd(cmd, db_name, armed=armed, file_path=file_path)
+    if armed:
+        hash_dump(bkp_path)
 
 
 def schema_dump_loop(
         db: ac.PostgresConfig,
-        bkp_path: Path,
+        bkp_base_path: Path,
         schema_list: [],
         db_name: str,
         armed=False
 ):
     """ Reference: https://www.postgresql.org/docs/10/app-pgdump.html """
     bkp_name = dt.now().strftime('%Y%m%d')
+    bkp_path = bkp_base_path / f'{bkp_name}'
     for schema in schema_list:
         file_name = f'{schema}.backup'
-        file_path = bkp_path / f'{bkp_name}' / db_name / file_name
+        file_path = bkp_path / db_name / file_name
         file_path.parent.mkdir(parents=True, exist_ok=True)
         template_config = {
             'db': db,
@@ -152,18 +155,20 @@ def schema_dump_loop(
         }
         cmd = _dump_cmd_template(**template_config)
         execute_cmd(cmd, db_name, armed=armed, file_path=file_path)
+    if armed:
+        hash_dump(bkp_path)
 
 
 def main(args: argparse.Namespace):
     if sys.platform != 'linux':
         raise NotImplementedError('script is only configured to work on linux')
     Path('logs').mkdir(exist_ok=True, parents=True)
-    backup_path = Path(args.backup_path)
+    bkp_base_path = Path(args.bkp_base_path)
     if args.dump_type == 'schema_wise':
         schema_list = get_schema_list(ac.pgc, args.db_name)
-        schema_dump_loop(ac.pgc, backup_path, schema_list, args.db_name, args.armed)
+        schema_dump_loop(ac.pgc, bkp_base_path, schema_list, args.db_name, args.armed)
     elif args.dump_type == 'basic':
-        basic_dump(ac.pgc, backup_path, args.db_name, args.armed)
+        basic_dump(ac.pgc, bkp_base_path, args.db_name, args.armed)
     else:
         msg = 'only `basic` or `schema_wise` dump implemented'
         raise NotImplementedError(msg)
@@ -181,8 +186,8 @@ if __name__ == '__main__':
         choices=['schema_wise', 'basic']
     )
     p.add_argument(
-        '--backup_path',
-        default=ac.BKP_BASE_PATH.__str__(),
+        '--bkp_base_path',
+        default=str(ac.BKP_BASE_PATH),
         help='path to ALL backups e.g. /home/user/db/bkp'
     )
     p.add_argument(
