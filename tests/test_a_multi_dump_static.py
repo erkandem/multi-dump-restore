@@ -24,7 +24,7 @@ class TestCmdTemplate:
             'db': tu.pgts.testing_pgc,
             'db_name': tu.TESTING_DATABASE,
             'file_path': file_path,
-            'backup_name': md.get_default_bkp_name(),
+            'bkp_name': md.get_default_bkp_name(),
             'caller': 'test_script'
         }
         print(md._dump_cmd_template(**template_config))
@@ -45,7 +45,7 @@ class TestCmdTemplate:
             'db': tu.pgts.testing_pgc,
             'db_name': tu.TESTING_DATABASE,
             'file_path': file_path,
-            'backup_name': md.get_default_bkp_name(),
+            'bkp_name': md.get_default_bkp_name(),
             'caller': 'test_script',
             'schema': random.choice(tu.SampleData.schema_names)
         }
