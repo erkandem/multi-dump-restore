@@ -226,6 +226,3 @@ dmypy.json
 .pyre/
 
 # End of https://www.gitignore.io/api/linux,python,pycharm
-/catmanual.sh
-/appconfig.py
-/mdr/appconfig.py
