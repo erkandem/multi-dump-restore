@@ -32,11 +32,11 @@ from pathlib import Path
 from typing import Union
 
 ALGO_DICT = {
- 'sha256': hashlib.sha256(),
- 'sha512': hashlib.sha512(),
+ 'sha256': hashlib.sha256,
+ 'sha512': hashlib.sha512,
 }
 SUPPORTED_ALGOS = list(ALGO_DICT)
-CHUNK_SIZE = 64 * 1024
+CHUNK_SIZE = 4 * 1024
 
 
 def fileChecksum(
@@ -48,17 +48,15 @@ def fileChecksum(
     if type(file_path) is str:
         file_path = Path(file_path)
     if algorithm in SUPPORTED_ALGOS:
-        hasher = ALGO_DICT[algorithm]
+        hash = ALGO_DICT[algorithm].__call__()
     else:
         errorMsg = f'Received: `{algorithm}`. Expected one of {", ".join(SUPPORTED_ALGOS)}'
         raise ValueError(errorMsg)
     try:
         with open(file_path, 'rb') as file:
-            buf = file.read(CHUNK_SIZE)
-            while len(buf) > 0:
-                hasher.update(buf)
-                buf = file.read(CHUNK_SIZE)
-        checksum = hasher.hexdigest()
+            for chunk in iter(lambda: file.read(CHUNK_SIZE), b''):
+                hash.update(chunk)
+            checksum = hash.hexdigest()
     except Exception as e:
         checksum = type(e).__name__
     if printing:
@@ -81,6 +79,7 @@ def createHashtree(
         for obj in objects
     }
     return hashTree
+
 
 def main(args: argparse.Namespace):
     directory = Path(args.directory)
