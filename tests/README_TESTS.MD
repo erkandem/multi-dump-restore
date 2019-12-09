@@ -57,10 +57,13 @@ $ docker container start agitated_poincare
 ## Executing the tests
 ```bash
 $ pytest tests --cov mdr --cov-branch -x -vv
+```
+
+optionally
+```bash
 $ coverage html
 $ firefox htmlcov/index.html
 ```
-
 
 ### References
 
