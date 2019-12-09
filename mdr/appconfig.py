@@ -1,7 +1,7 @@
 import os
 import getpass
 import dotenv
-dotenv.load_dotenv('.env')
+dotenv.load_dotenv(dotenv.find_dotenv(raise_error_if_not_found=True))
 
 
 class PostgresConfig:
