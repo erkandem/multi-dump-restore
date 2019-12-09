@@ -27,6 +27,7 @@ KNOWN_DB_NAMES = [
     # won't touch ~/.pgpass
 ]
 
+
 def check_if_known_db_name(db_name):
     if db_name not in KNOWN_DB_NAMES:
         print(

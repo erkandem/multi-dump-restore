@@ -1,6 +1,6 @@
 import testing_utilities as tu
-import appconfig
-import multi_dump as md
+from mdr import appconfig
+from mdr import multi_dump as md
 import random
 
 

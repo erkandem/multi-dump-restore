@@ -15,7 +15,15 @@ from typing import Union
 from pathlib import Path
 import sys
 from sqlalchemy import create_engine
-import appconfig as ac
+try:
+    from mdr import appconfig as ac
+except ImportError:
+    import appconfig as ac
+
+try:
+    from mdr import hashing as hs
+except ImportError:
+    import hashing as hs
 
 
 def nowstr():
@@ -35,7 +43,6 @@ def compose_bkp_file_path(*, backup_path,  backup_name, db_name,  file_name):
 
 
 def hash_dump(bkp_path):
-    from py_essentials import hashing as hs
     data = hs.createHashtree(bkp_path)
     if type(bkp_path) is str:
         bkp_path = Path(bkp_path)

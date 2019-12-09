@@ -7,3 +7,4 @@ MINOR = 1
 EXTRA = 1
 
 __version__ = f'{MAJOR}.{MINOR}.{EXTRA}'
+

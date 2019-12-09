@@ -1,5 +1,5 @@
 import testing_utilities as tu
-import multi_dump as md
+from mdr import multi_dump as md
 
 
 class TestDump:

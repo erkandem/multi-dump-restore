@@ -141,9 +141,10 @@ you are likely to sit on a pile of dumps.
 
 
 ### CLI Documentation
-#### `multi_dump`
+#### `mdr dump | multi_dump.py`
 ```bash
-usage: multi_dump.py [-h] [--backup_path BACKUP_PATH] [--armed {True,False}]
+usage: multi_dump.py [-h] [--bkp_base_path BKP_BASE_PATH]
+                     [--armed {True,False}]
                      db_name {schema_wise,basic}
 
 positional arguments:
@@ -153,29 +154,30 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  --backup_path BACKUP_PATH
+  --bkp_base_path BKP_BASE_PATH
                         path to ALL backups e.g. /home/user/db/bkp
   --armed {True,False}  really execute commands? `False` by default
 ```
-#### `multi_restore`
+#### `mdr restore | multi_restore.py`
 ```bash
-usage: multi_restore.py [-h] [--backup_path BACKUP_PATH]
+usage: multi_restore.py [-h] [--bkp_base_path BKP_BASE_PATH]
                         [--armed {True,False}]
-                        backup_name backup_db_name restore_db_name
+                        backup_name bkp_db_name restore_db_name
 
 positional arguments:
   backup_name           ONE PARTICULAR backup e.g. 20191123 for
                         /home/user/db/bkp/20191123
-  backup_db_name        database from which the schema was dumped
+  bkp_db_name           database from which the schema was dumped
   restore_db_name       database to which the schema should be restored to
 
 optional arguments:
   -h, --help            show this help message and exit
-  --backup_path BACKUP_PATH
+  --bkp_base_path BKP_BASE_PATH
                         path to all backups on system default:
                         /home/user/db/bkp/
   --armed {True,False}  really execute commands? `False` by default
 ```
+
 
 
 
@@ -237,4 +239,3 @@ Otherwise only one rules.
  - Author Erkan Demiralay
  - Contact:  [erkan.dem@pm.me](mailto:erkan.dem@pm.me)
  - Repo: [https://github.com/erkandem/multi-dump-restore](https://github.com/erkandem/multi-dump-restore)
-

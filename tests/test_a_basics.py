@@ -1,4 +1,4 @@
-import multi_dump as md
+from mdr import multi_dump as md
 from pathlib import Path
 from datetime import datetime as dt
 

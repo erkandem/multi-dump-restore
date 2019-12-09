@@ -6,7 +6,11 @@ import argparse
 from pathlib import Path
 from datetime import datetime as dt
 import multiprocessing
-import appconfig as ac
+try:
+    from mdr import appconfig as ac
+except ImportError:
+    import appconfig as ac
+
 
 PAUSE_BETWEEN_RESTORE_SECONDS = 1
 CORES = multiprocessing.cpu_count()
@@ -111,13 +115,13 @@ def main(args: argparse.Namespace):
     if not bkp_path.exists():
         raise ValueError(f'Path does not seem to exist\n: {bkp_path}')
     ini = restore_scouting(bkp_path)
-    if args.backup_db_name in list(ini):
-        N = len(ini[args.backup_db_name]['schemata'])
+    if args.bkp_db_name in list(ini):
+        N = len(ini[args.bkp_db_name]['schemata'])
         print(f'# starting to restore {N} schemata')
         restore_loop(
             ac.pgc,
-            ini[args.backup_db_name],
-            source=args.backup_db_name,
+            ini[args.bkp_db_name],
+            source=args.bkp_db_name,
             target=args.restore_db_name,
             armed=args.armed
         )
@@ -156,6 +160,6 @@ if __name__ == "__main__":
         a.armed = False
     if a.armed == 'True':
         a.armed = True
-    ac.check_if_known_db_name(a.backup_db_name)
+    ac.check_if_known_db_name(a.bkp_db_name)
     ac.check_if_known_db_name(a.restore_db_name)
     main(a)

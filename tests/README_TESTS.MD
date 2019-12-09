@@ -17,6 +17,8 @@ $ docker run -e POSTGRES_PASSWORD=postgres -d -p 5433:5432 -v $HOME/docker/volum
 
 `-v` local:container filesystem mapping
 
+`-d` detached / daemonized 
+
 `postgres:10-alpine` image:tag to create a container from
 
 The successful execution will return an container ID  51255bf754f5****.
@@ -54,5 +56,12 @@ $ docker container start agitated_poincare
 
 ## Executing the tests
 ```bash
-$ pytest -x  -vv
+$ pytest tests --cov mdr --cov-branch -x -vv
+$ coverage html
+$ firefox htmlcov/index.html
 ```
+
+
+### References
+
+Source: https://hackernoon.com/dont-install-postgres-docker-pull-postgres-bee20e200198

@@ -6,7 +6,7 @@ import numpy as np
 from sqlalchemy import Date, Float
 from sqlalchemy import create_engine
 from pathlib import Path
-import appconfig
+from mdr import appconfig
 from sqlalchemy.engine import Engine
 from pandas.core.indexes.datetimes import DatetimeIndex
 
