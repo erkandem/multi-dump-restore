@@ -1,5 +1,6 @@
 import os
 import getpass
+from pathlib import Path
 import dotenv
 dotenv.load_dotenv(dotenv.find_dotenv(raise_error_if_not_found=True))
 
@@ -21,6 +22,8 @@ class PostgresConfig:
 
 pgc = PostgresConfig()
 USER = getpass.getuser()
+BKP_BASE_PATH = Path(os.getenv('BKP_BASE_PATH')) or Path(f'/home/{USER}/db/bkp')
+
 KNOWN_DB_NAMES = [
     # previously configured and used databases
     # manually maintained because the script
