@@ -74,17 +74,13 @@ def createHashtree(
     if type(directory) is str:
         directory = Path(directory)
     objects = [obj for obj in directory.iterdir()]
-    hashTree = [
-        {
-            'name': obj.name,
-            algorithm: fileChecksum(obj, algorithm)
-        }
+    hashTree = {
+        obj.name: fileChecksum(obj, algorithm)
         if obj.is_file()
         else createHashtree(obj, algorithm)
         for obj in objects
-    ]
+    }
     return hashTree
-
 
 def main(args: argparse.Namespace):
     directory = Path(args.directory)
