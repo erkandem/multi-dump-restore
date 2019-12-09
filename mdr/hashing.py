@@ -34,8 +34,6 @@ from typing import Union
 ALGO_DICT = {
  'sha256': hashlib.sha256(),
  'sha512': hashlib.sha512(),
- 'sha1':  hashlib.sha1(),
- 'md5': hashlib.md5()
 }
 SUPPORTED_ALGOS = list(ALGO_DICT)
 CHUNK_SIZE = 64 * 1024
@@ -43,7 +41,7 @@ CHUNK_SIZE = 64 * 1024
 
 def fileChecksum(
         file_path: Union[str, Path],
-        algorithm: str = 'sha1',
+        algorithm: str = 'sha256',
         printing: bool = False
 ):
     """generates any checksum of a file"""
@@ -70,19 +68,21 @@ def fileChecksum(
 
 def createHashtree(
         directory: Union[str, Path],
-        algorithm: str = 'sha1'
+        algorithm: str = 'sha256'
 ):
     """creates a tree view of a directory with the file hashes"""
     if type(directory) is str:
         directory = Path(directory)
     objects = [obj for obj in directory.iterdir()]
-    hashTree = {
-        obj.name:
-            fileChecksum(obj, algorithm)
-            if obj.is_file()
-            else createHashtree(obj, algorithm)
+    hashTree = [
+        {
+            'name': obj.name,
+            algorithm: fileChecksum(obj, algorithm)
+        }
+        if obj.is_file()
+        else createHashtree(obj, algorithm)
         for obj in objects
-    }
+    ]
     return hashTree
 
 
@@ -90,7 +90,7 @@ def main(args: argparse.Namespace):
     directory = Path(args.directory)
     if not directory.exists():
         raise FileExistsError(f'{directory} does not seem to exist')
-    data = createHashtree(directory, 'md5')
+    data = createHashtree(directory, 'sha256')
     print(json.dumps(data, sort_keys=True, indent=4))
 
 
