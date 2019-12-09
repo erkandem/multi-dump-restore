@@ -22,7 +22,8 @@ class PostgresConfig:
 
 pgc = PostgresConfig()
 USER = getpass.getuser()
-BKP_BASE_PATH = Path(os.getenv('BKP_BASE_PATH')) or Path(f'/home/{USER}/db/bkp')
+BKP_BASE_PATH = os.getenv('BKP_BASE_PATH') or f'/home/{USER}/db/bkp'
+BKP_BASE_PATH = Path(BKP_BASE_PATH)
 
 KNOWN_DB_NAMES = [
     # previously configured and used databases
