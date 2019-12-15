@@ -35,7 +35,7 @@ KNOWN_DB_NAMES = [
 def check_if_known_db_name(db_name):
     if db_name not in KNOWN_DB_NAMES:
         print(
-            f'The backup_db_name given ({db_name}) '
-            f'does not appear in the known_databases list in `appconfig`'
+            f'# The `backup_db_name` given ({db_name}) '
+            f'does not appear in the `known_databases` list in `appconfig`.'
             f'Be sure you left a record in the `.pgpass` file'
         )
