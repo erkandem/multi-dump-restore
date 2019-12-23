@@ -80,6 +80,35 @@ def execute_restore(cmd_fragments, *, armed=False, d: LogDetails = None):
         )
 
 
+def public_schema_first(schema_bkps: [Path]) -> [Path]:
+    """
+    see if the public schema is part of the dumped schemata and
+    put it into the first position
+    """
+    public_index = [k for k, elm in enumerate(schema_bkps) if elm.stem == 'public']
+    if len(public_index) > 0:
+        public = schema_bkps.pop(public_index[0])
+        schema_bkps = [public] + schema_bkps
+    return schema_bkps
+
+
+def create_schema_obj(db: Path):
+    """ create an object describing all schemas of a database
+    abstracted to sort the schema names
+    and restore "public" schema first, if available
+    """
+    schema_bkps = [sm for sm in db.iterdir() if sm.suffix == '.backup']
+    schema_bkps.sort()
+    schema_bkps = public_schema_first(schema_bkps)
+    obj = {
+        sm.stem: {
+            'name': sm.stem,
+            'path': sm.__str__()
+        } for sm in schema_bkps
+    }
+    return obj
+
+
 def restore_scouting(single_backup_path: Path):
     """
     Creates a representation of the `backup_path` folder
@@ -89,17 +118,15 @@ def restore_scouting(single_backup_path: Path):
     backup_path: absolute path to the directory
                 in which pg_dump output was directed
     """
+    if type(single_backup_path) is str:
+        single_backup_path = Path(single_backup_path)
+
     db_folders = {
         db.name: {
             'name': db.name,
             'bkp_name': single_backup_path.name,
             'path': db.__str__(),
-            'schemata': {
-                sm.stem: {
-                    'name': sm.stem,
-                    'path': sm.__str__()
-                } for sm in db.iterdir() if sm.suffix == '.backup'
-            }
+            'schemata': create_schema_obj(db)
         }
         for db in single_backup_path.iterdir() if db.is_dir()
     }
