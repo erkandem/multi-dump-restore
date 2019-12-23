@@ -4,6 +4,6 @@ N.N[.N]+[{a|b|c|rc}N[.N]+][.postN][.devN]
 """
 MAJOR = 0
 MINOR = 1
-EXTRA = 2
+EXTRA = 3
 
 __version__ = f'{MAJOR}.{MINOR}.{EXTRA}'
