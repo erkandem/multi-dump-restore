@@ -18,7 +18,7 @@ Example could be:
  - financial dataset consisting of: `timestamp`, `open`, `high`, `low`, `close`, `volume` and more.
 
 Dumping and restoring the complete database in one piece might be undesired because
- - size might be incontinent (e.g. upload(!) and download duration),
+ - size might be unacceptable (e.g. upload(!) and download duration),
  - may take to long (i.e. at least tell us the progress ffs),
  - may not be necessary since the datasets are not interrelated.
 
